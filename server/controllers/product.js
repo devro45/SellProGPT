@@ -5,6 +5,7 @@ const formidable = require("formidable");
 const { validationResult } = require("express-validator");
 const _ = require("lodash");
 const fs = require("fs");
+const path = require("path");
 
 exports.getProductById = (req, res, next, id) => {
   Product.findById(id)
@@ -24,34 +25,39 @@ exports.getProductById = (req, res, next, id) => {
       });
     });
 };
-
 exports.uploadProduct = (req, res) => {
   let form = new formidable.IncomingForm();
   form.keepExtensions = true;
 
   form.parse(req, (err, fields, file) => {
-    console.log("enetering");
     if (err) {
-      return res.status(400).json({
-        error: "Some problem occured with image",
-      });
+      return res.status(400).json({ error: "Error parsing form data" });
     }
-    console.log("furst");
-    const { name, description, price, category } = fields;
 
-    const product = new Product({
-      name: name.toString(),
-      description: description.toString(),
-      price: parseFloat(price), // Assuming price should be converted to a number
-      category: category.toString(),
-    });
-    if (!name || !description || !price || !category) {
-      return res.status(400).json({
-        error: "Please include all these fields",
-      });
+    // Validate form fields
+    if (
+      !fields.name ||
+      !fields.description ||
+      !fields.price ||
+      !fields.category
+    ) {
+      return res.status(400).json({ error: "Please include all the fields" });
     }
-    console.log("sec");
-    // let product = new Product(fields);
+
+    // Validate file size
+    if (file.photo && file.photo.size > 400000) {
+      return res.status(400).json({ error: "File size is too large" });
+    }
+
+    let product = new Product({
+      name: fields.name[0],
+      description: fields.description[0],
+      price: fields.price[0],
+      category: fields.category[0],
+      // Include other fields here as needed
+    });
+
+    // console.log(product);
     const publisherId = req.params.userId;
     product.userId = publisherId;
 
@@ -61,9 +67,11 @@ exports.uploadProduct = (req, res) => {
           error: "File size is too large!",
         });
       }
-      product.photo.data = fs.readFileSync(file.photo.filepath);
-      product.photo.contentType = file.photo.mimetype;
+
+      product.photo.data = fs.readFileSync(file.photo[0].filepath);
+      product.photo.contentType = file.photo[0].mimetype;
     }
+
     product
       .save()
       .then((savedProduct) => {
@@ -72,9 +80,8 @@ exports.uploadProduct = (req, res) => {
         });
       })
       .catch((error) => {
-        console.error("Error saving product:", error);
         res.status(400).json({
-          error: `Failed to upload ${name}`,
+          error: `Failed to upload ${savedProduct.name}`,
         });
       });
   });
@@ -133,8 +140,8 @@ exports.updateProduct = (req, res) => {
           error: "File size is too large!",
         });
       }
-      product.photo.data = fs.readFileSync(file.photo.filepath);
-      product.photo.contentType = file.photo.mimetype;
+      product.photo.data = fs.readFileSync(file.photo[0].filepath);
+      product.photo.contentType = file.photo[0].mimetype;
     }
 
     product
@@ -200,16 +207,22 @@ exports.getUnverifiedProducts = (req, res) => {
 
 exports.adminDeleteProduct = (req, res) => {
   let product = req.product;
-  product.remove((err, prod) => {
-    if (err) {
-      return res.status(400).json({
-        error: `Failed to delete ${prod.name}`,
+  Product.deleteOne({ _id: product._id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        return res.status(400).json({
+          error: `Failed to delete ${product.name}`,
+        });
+      }
+      res.json({
+        message: `Deleted ${product.name} successfully.`,
       });
-    }
-    res.json({
-      message: `Deleted ${prod.name} successfully.`,
+    })
+    .catch((err) => {
+      return res.status(400).json({
+        error: `Failed to delete ${product.name}`,
+      });
     });
-  });
 };
 
 exports.adminApproveProduct = (req, res) => {

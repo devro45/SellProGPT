@@ -1,7 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import NoAccess from "../components/Core/NoAccess";
+import MyProducts from "../components/PageComponents/MyProducts";
+import { isAuthenticated } from "../apiCalls/auth";
 
-const MyProducts = () => {
-  return <div>My Products</div>;
+const MyProductsPage = () => {
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated()) setIsSignedIn(true);
+  }, []);
+
+  return (
+    <>
+      <title>{isSignedIn ? "My Products" : "Access Denied"}</title>
+
+      <main>{isSignedIn ? <MyProducts /> : <NoAccess />}</main>
+    </>
+  );
 };
 
-export default MyProducts;
+export default MyProductsPage;

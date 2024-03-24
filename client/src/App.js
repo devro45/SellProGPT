@@ -9,12 +9,26 @@ import MyProducts from "./pages/MyProducts";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/Signup";
 import Upload from "./pages/Upload";
+import Admin from "./pages/Admin";
+import { ChakraProvider } from "@chakra-ui/react";
+import Layout from "./components/Core/Layout";
+import theme from "./theme";
+import { Toaster } from "react-hot-toast";
+import appStore from "./utils/appStore";
+import { Provider, useSelector } from "react-redux";
+import GptSearch from "../src/components/GptSearch";
 
 const App = () => {
   return (
     <div>
-      <Header />
-      <Outlet />
+      <Provider store={appStore}>
+        <ChakraProvider theme={theme}>
+          <Header />
+
+          <Outlet />
+          <Toaster />
+        </ChakraProvider>
+      </Provider>
     </div>
   );
 };
@@ -27,6 +41,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/",
         element: <Main />,
+      },
+      {
+        path: "gptSearch",
+        element: <GptSearch />,
       },
       {
         path: "products",
@@ -51,6 +69,10 @@ const appRouter = createBrowserRouter([
       {
         path: "signup",
         element: <SignUp />,
+      },
+      {
+        path: "admin",
+        element: <Admin />,
       },
     ],
   },

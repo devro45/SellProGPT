@@ -114,7 +114,6 @@ exports.isAuthenticated = (req, res, next) => {
       error: "Access Denied",
     });
   }
-  console.log("going to uploading bro");
   next();
 };
 
