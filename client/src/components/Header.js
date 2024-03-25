@@ -64,14 +64,21 @@ const Navbar = () => {
       top="0"
       w={"full"}
       boxShadow={"lg"}
+      md="flex-row"
       zIndex="999"
     >
-      <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+      <Flex
+        h={16}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        maxW="7xl"
+        mx="auto"
+      >
         <IconButton
           size={"md"}
           icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
           aria-label={"Open Menu"}
-          display={{ md: "none" }}
+          display={{ base: "block", md: "none" }}
           onClick={handleToggle}
         />
         <Flex alignItems={"center"}>
