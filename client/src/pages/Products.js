@@ -76,7 +76,7 @@ const Products = () => {
   };
 
   const searchProducts = () => {
-    filteredProducts = products.filter((product) => {
+    const filterProducts = products.filter((product) => {
       if (
         searchTerm === "" ||
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,7 +85,7 @@ const Products = () => {
         return product;
       }
     });
-    setFilteredProducts([...filteredProducts]);
+    setFilteredProducts([...filterProducts]);
   };
 
   const clearSearch = () => {

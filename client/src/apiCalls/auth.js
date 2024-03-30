@@ -1,7 +1,7 @@
 import API from "./index";
 
 export const signup = ({ name, email, password }) => {
-  console.log(user);
+
   return fetch("http://localhost:5000/signup", {
     method: "POST",
     headers: {
