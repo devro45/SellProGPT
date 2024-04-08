@@ -66,7 +66,7 @@ const MyProducts = () => {
   }, []);
 
   return (
-    <Box w="100%" bg="gray.100">
+    <Box w="100%" bg="gray.700">
       {products.length > 0 ? (
         <Box w="95vw" mt="24" mb="16" h="100vh">
           <VStack spacing="12">
